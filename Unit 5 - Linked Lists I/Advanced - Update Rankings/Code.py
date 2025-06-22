@@ -3,9 +3,8 @@ class Node:
         self.player_name = player
         self.next = next
 
-# For testing
 def print_linked_list(head):
-    # Correction to match sample
+    # Correction to match example
     if not head:
         print("None")
         return
@@ -15,31 +14,51 @@ def print_linked_list(head):
         current = current.next
 
 def increment_rank(head, target):
-    previous = current = head
+    left = right = head
     
+    # Mario (target) -> Peach -> Luigi -> Daisy -> None
+    # None
     if target == 1 or head is None:
         return head
     
     for i in range(1, target-1):
-        previous = current
-        current = current.next
-        if current is None:
+        left = right
+        right = right.next
+        if right is None: # Target is out of bounds
             return head
-        
-    if current.next.next is None:
-        previous.next = current.next
-        previous.next.next = current
-        current.next = None
+
+    # left   right
+    # Mario (target-1) -> Luigi (target) -> Daisy -> None
+    if left == right:
+        right = left.next              # Mario (left) -> Luigi (right) -> Daisy -> None
+        left = right.next              # Mario (left) -> Daisy -> None
+        right.next = left              # Luigi (right) -> Mario (left) -> Daisy -> None
+    #          left         right
+    # Wario -> Mario -> Peach (target-1) -> Luigi (target) -> None
+    elif right.next.next is None:
+        left.next = right.next         # Wario -> Mario (left) -> Luigi -> None
+        left.next.next = right         # Wario -> Mario (left) -> Luigi -> Peach (right)
+        right.next = None              # Wario -> Mario (left) -> Luigi -> Peach (right) -> None
+    #          left          right    
+    # Wario -> Mario -> Peach (target-1) -> Luigi (target) -> Daisy -> Bowser -> None
     else:
-        previous.next = current.next
-        current.next = previous.next.next
-        previous.next.next = current
+        left.next = right.next         # Wario -> Mario (left) -> Luigi -> Daisy -> Wario -> Bowser -> None
+        right.next = left.next.next    # Peach (right) -> Daisy -> Wario -> Bowser -> None
+        left.next.next = right         # Wario -> Mario (left) -> Luigi -> Peach (right) -> Daisy -> Wario -> Bowser -> None
 
     return head
 
 racers1 = Node("Mario", Node("Peach", Node("Luigi", Node("Daisy"))))
 racers2 = Node("Mario", Node("Luigi"))
+racers3 = Node("Mario", Node("Luigi", Node("Peach", Node("Daisy"))))
+racers4 = Node("Mario")
+racers5 = Node("Mario", Node("Peach"))
+racers6 = Node("Mario", Node("Luigi", Node("Peach")))
 
-print_linked_list(increment_rank(racers1, 3))
-print_linked_list(increment_rank(racers2, 1)) 
-print_linked_list(increment_rank(None, 1))
+print_linked_list(increment_rank(racers1, 3))   # Mario -> Luigi -> Peach -> Daisy
+print_linked_list(increment_rank(racers2, 1))   # Mario -> Luigi
+print_linked_list(increment_rank(None, 1))      # None
+print_linked_list(increment_rank(racers3, 4))   # Mario -> Luigi -> Daisy -> Peach
+print_linked_list(increment_rank(racers4, 1))   # Mario
+print_linked_list(increment_rank(racers5, 2))   # Peach -> Mario
+print_linked_list(increment_rank(racers6, 5))   # Mario -> Luigi -> Peach
