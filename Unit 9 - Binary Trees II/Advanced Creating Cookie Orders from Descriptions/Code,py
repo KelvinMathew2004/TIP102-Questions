@@ -1,0 +1,83 @@
+from collections import deque
+
+class TreeNode:
+    def __init__(self, flavor, left=None, right=None):
+        self.val = flavor
+        self.left = left
+        self.right = right
+
+def print_tree(root):
+    if not root:
+        return "Empty"
+    result = []
+    queue = deque([root])
+    while queue:
+        node = queue.popleft()
+        if node:
+            result.append(node.val)
+            queue.append(node.left)
+            queue.append(node.right)
+        else:
+            result.append(None)
+    while result and result[-1] is None:
+        result.pop()
+    print(result)
+
+def build_cookie_tree(descriptions):
+    isChild = set()
+    nodes = dict()
+
+    for parent, child, is_left in descriptions:
+        if parent not in nodes:
+            nodes[parent] = TreeNode(parent)
+
+        if child not in nodes:
+            nodes[child] = TreeNode(child)
+            isChild.add(child)
+
+        if is_left == 1:
+            nodes[parent].left = nodes[child]
+        elif is_left == 0:
+            nodes[parent].right = nodes[child]
+
+    for node in nodes.values():
+        if node.val not in isChild:
+            return node
+
+        
+
+
+# Example Usage:
+
+descriptions1 = [
+    ["Chocolate Chip", "Peanut Butter", 1],
+    ["Chocolate Chip", "Oatmeal Raisin", 0],
+    ["Peanut Butter", "Sugar", 1]
+]
+
+descriptions2 = [
+    ["Ginger Snap", "Snickerdoodle", 0],
+    ["Ginger Snap", "Shortbread", 1]
+]
+
+# # Using print_tree() function included at top of page
+print_tree(build_cookie_tree(descriptions1))
+print_tree(build_cookie_tree(descriptions2))
+
+# Example Output:
+
+# ['Chocolate Chip', 'Peanut Butter', 'Oatmeal Raisin', 'Sugar']
+# Example 1 Explanation:
+# The tree structure:
+#       Chocolate Chip
+#      /              \
+# Peanut Butter     Oatmeal Raisin
+#     /
+#  Sugar
+
+# ['Ginger Snap', 'Shortbread', 'Snickerdoodle']
+# Example 2 Explanation:
+# The tree structure:
+#       Ginger Snap
+#      /           \
+# Shortbread   Snickerdoodle
